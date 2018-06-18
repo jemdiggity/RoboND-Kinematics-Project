@@ -9,7 +9,7 @@
 [image5]: ./misc_images/IMG_3283.jpg
 [image6]: ./misc_images/image-3.png
 [image7]: ./misc_images/image-4.png
-[image8]: ./misc_images/IMG_3285.jpg
+[image8]: ./misc_images/IMG_3285.JPG
 [image9]: ./misc_images/image-3_1.png
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/972/view) Points
