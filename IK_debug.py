@@ -132,50 +132,50 @@ def test_code(test_case):
     # translate along z-axis (See lesson 11.18 Inverse Kinematics)
     wrist_centre = end_effector - d7 * rotation_ee[:,2]
 
-    print 'Calculated WC is {}, test case centre is {}'.format(wrist_centre, test_case[1])
+    # print 'Calculated WC is {}, test case centre is {}'.format(wrist_centre, test_case[1])
 
     # Step 3: find first 3 join angles
 
     theta1 = atan2(wrist_centre[1], wrist_centre[0])
-    print 'theta1 {} type {}'.format(theta1, type(theta1))
+    # print 'theta1 {} type {}'.format(theta1, type(theta1))
 
     # SSS and law of cosines
     # side c is simple
     side_c = a2
-    print 'side C {}'.format(side_c)
+    # print 'side C {}'.format(side_c)
     # determine fixed length from joint 3 to joint 5
     side_a = sqrt(d4 ** 2 + a3 ** 2)
-    print 'side A {}'.format(side_a)
+    # print 'side A {}'.format(side_a)
     # determine length from joint 2 to wrist centre
     side_b = sqrt(
         (sqrt(wrist_centre[0] ** 2 + wrist_centre[1] ** 2) - a1) ** 2 +
         (wrist_centre[2] - d1) ** 2)
-    print 'side B {}'.format(side_b)
+    # print 'side B {}'.format(side_b)
 
     angle_a = acos((side_b ** 2 + side_c ** 2 - side_a ** 2) / (2 * side_b * side_c))
-    print 'angle_a {}'.format(angle_a)
+    # print 'angle_a {}'.format(angle_a)
     angle_b = acos((side_a ** 2 + side_c ** 2 - side_b ** 2) / (2 * side_a * side_c))
 #    angle_c = pi - angle_a - angle_b
     angle_c = acos((side_a ** 2 + side_b ** 2 - side_c ** 2) / (2 * side_a * side_b))
-    print 'theta2 sqrt component {}'.format(sqrt(wrist_centre[0] ** 2 + wrist_centre[1] ** 2) - a1)
-    print 'theta2 arctan component {}'.format(atan2(wrist_centre[2] - d1, sqrt(wrist_centre[0] ** 2 + wrist_centre[1] ** 2) - a1))
+    # print 'theta2 sqrt component {}'.format(sqrt(wrist_centre[0] ** 2 + wrist_centre[1] ** 2) - a1)
+    # print 'theta2 arctan component {}'.format(atan2(wrist_centre[2] - d1, sqrt(wrist_centre[0] ** 2 + wrist_centre[1] ** 2) - a1))
 
     theta2 = pi / 2 - angle_a - atan2(wrist_centre[2] - d1, sqrt(wrist_centre[0] ** 2 + wrist_centre[1] ** 2) - a1)
-    print 'theta2 {} type {}'.format(theta2, type(theta2))
+    # print 'theta2 {} type {}'.format(theta2, type(theta2))
 
     side_d = sqrt(0.96 ** 2 + 0.054 ** 2)
     side_e = 0.54
     theta3_correction  =  atan2(abs(a3), d4)
-    print "theta3 correction {}".format(theta3_correction)
-    theta3 = pi / 2 - angle_b - 0.036
-    print 'theta3 {} type {}'.format(theta3, type(theta3))
+    # print "theta3 correction {}".format(theta3_correction)
+    theta3 = pi / 2 - angle_b - theta3_correction
+    # print 'theta3 {} type {}'.format(theta3, type(theta3))
 
     R0_3 = t0_1[0:3, 0:3] * t1_2[0:3, 0:3] * t2_3[0:3,0:3]
     R0_3 = R0_3.evalf(subs={q1: theta1, q2: theta2, q3: theta3})
     R3_6 = R0_3.transpose() * rotation_ee
 
     theta4 = atan2(R3_6[2,2], -R3_6[0,2])
-    print 'theta4 {} type {}'.format(theta4, type(theta4))
+    # print 'theta4 {} type {}'.format(theta4, type(theta4))
     theta5 = atan2(sqrt(R3_6[0,2] ** 2 + R3_6[2,2] ** 2), R3_6[1,2])
     theta6 = atan2(-R3_6[1,1], R3_6[1,0])
 
@@ -245,6 +245,6 @@ def test_code(test_case):
 
 if __name__ == "__main__":
     # Change test case number for different scenarios
-    test_case_number = 1
+    test_case_number = 3
 
     test_code(test_cases[test_case_number])
