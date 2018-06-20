@@ -166,10 +166,28 @@ def handle_calculate_IK(req):
             R0_3 = R0_3.evalf(subs={q1: theta1, q2: theta2, q3: theta3})
             R3_6 = R0_3.transpose() * rotation_ee
 
-            theta4 = atan2(R3_6[2,2], -R3_6[0,2])
-            # print 'theta4 {} type {}'.format(theta4, type(theta4))
-            theta5 = atan2(sqrt(R3_6[0,2] ** 2 + R3_6[2,2] ** 2), R3_6[1,2])
-            theta6 = atan2(-R3_6[1,1], R3_6[1,0])
+            r11 = R3_6[0,0]
+            r21 = R3_6[1,0]
+            r31 = R3_6[2,0]
+            r12 = R3_6[0,1]
+            r22 = R3_6[1,1]
+            r32 = R3_6[2,1]
+            r13 = R3_6[0,2]
+            r23 = R3_6[1,2]
+            r33 = R3_6[2,2]
+            gamma = atan2(r33, -r13)
+            beta1 = atan2(sqrt(r13**2 + r33**2), r23)
+            beta2 = -atan2(sqrt(r13**2 + r33**2), r23)
+            alpha = atan2(-r22, r21)
+
+            if abs(gamma) < abs(gamma + pi):
+                theta4 = gamma
+                theta5 = beta1
+                theta6 = alpha % pi
+            else:
+                theta4 = gamma + pi
+                theta5 = beta2
+                theta6 = alpha % pi
 
     	    #
     	    #
@@ -181,6 +199,7 @@ def handle_calculate_IK(req):
             # Populate response for the IK request
             # In the next line replace theta1,theta2...,theta6 by your joint angle variables
     	    joint_trajectory_point.positions = [theta1, theta2, theta3, theta4, theta5, theta6]
+            print('Joint angles {}'.format(joint_trajectory_point.positions))
     	    joint_trajectory_list.append(joint_trajectory_point)
 
         rospy.loginfo("length of Joint Trajectory List: %s" % len(joint_trajectory_list))

@@ -97,10 +97,10 @@ def test_code(test_case):
     t3_4 = DH_Transform(alpha3, a3, d4, q4).subs(dh_table)
     t4_5 = DH_Transform(alpha4, a4, d5, q5).subs(dh_table)
     t5_6 = DH_Transform(alpha5, a5, d6, q6).subs(dh_table)
-    t6_7 = DH_Transform(alpha6, a6, d7, q7).subs(dh_table)
+    t6_ee = DH_Transform(alpha6, a6, d7, q7).subs(dh_table)
 
 # Step 2: find Wrist Centre
-    t0_ee = t0_1 * t1_2 * t2_3 * t3_4 * t4_5 * t5_6 * t6_7
+    t0_ee = t0_1 * t1_2 * t2_3 * t3_4 * t4_5 * t5_6 * t6_ee
 
     r, p, y = symbols('r p y')
     rotation_x = Matrix([
@@ -125,6 +125,7 @@ def test_code(test_case):
         req.poses[0].orientation.w])
 
     rotation_ee = (rotation_intrinsic * rotation_correction).subs({'r': roll, 'p': pitch, 'y': yaw})
+    # rotation_ee = (rotation_intrinsic).subs({'r': roll, 'p': pitch, 'y': yaw}) * rotation_correction
 
     px, py, pz = req.poses[0].position.x, req.poses[0].position.y, req.poses[0].position.z
     end_effector = Matrix([[px], [py], [pz]])
@@ -174,10 +175,36 @@ def test_code(test_case):
     R0_3 = R0_3.evalf(subs={q1: theta1, q2: theta2, q3: theta3})
     R3_6 = R0_3.transpose() * rotation_ee
 
-    theta4 = atan2(R3_6[2,2], -R3_6[0,2])
-    # print 'theta4 {} type {}'.format(theta4, type(theta4))
-    theta5 = atan2(sqrt(R3_6[0,2] ** 2 + R3_6[2,2] ** 2), R3_6[1,2])
-    theta6 = atan2(-R3_6[1,1], R3_6[1,0])
+    r11 = R3_6[0,0]
+    r21 = R3_6[1,0]
+    r31 = R3_6[2,0]
+    r12 = R3_6[0,1]
+    r22 = R3_6[1,1]
+    r32 = R3_6[2,1]
+    r13 = R3_6[0,2]
+    r23 = R3_6[1,2]
+    r33 = R3_6[2,2]
+    # beta = atan2(-r13, sqrt(r11 ** 2 + r12 ** 2))
+    # gamma = atan2(-r12, r11)
+    # alpha = atan2(r33, r23)
+    gamma = atan2(r33, -r13)
+    beta1 = atan2(sqrt(r13**2 + r33**2), r23)
+    beta2 = -atan2(sqrt(r13**2 + r33**2), r23)
+    alpha = atan2(-r22, r21)
+
+    if abs(beta1) < abs(beta2):
+        theta4 = gamma
+        theta5 = beta1
+        theta6 = alpha
+    else:
+        theta4 = gamma + pi
+        theta5 = beta2
+        theta6 = alpha + pi
+
+    i = 0
+    for theta in (theta1, theta2, theta3, theta4, theta5, theta6):
+        print 'theta{0} {1:.4f}\n'.format(i, theta.evalf())
+        i += 1
 
     ##
     ########################################################################################
@@ -245,6 +272,6 @@ def test_code(test_case):
 
 if __name__ == "__main__":
     # Change test case number for different scenarios
-    test_case_number = 3
+    test_case_number = 1
 
     test_code(test_cases[test_case_number])
