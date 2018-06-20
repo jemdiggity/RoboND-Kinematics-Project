@@ -11,6 +11,7 @@
 [image7]: ./misc_images/image-4.png
 [image8]: ./misc_images/IMG_3285.JPG
 [image9]: ./misc_images/image-3_1.png
+[image10]: ./misc_images/IMG_3292.JPG
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/972/view) Points
 ### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
@@ -157,6 +158,38 @@ The 2nd angle is determined by making a triangle of joint 2, 3, and 5 and then s
 The 3rd angle is likewise determined using cosine law except that angle has to be adjusted because the 3rd side of the triangle between joint 3 and 5 doesn't include joint 4. The correction is:
 ```python
 theta3_correction  =  atan2(abs(a3), d4)
+```
+
+For the wrist angles, theta 4 thru 6, we need to determine the rotation matrix from joint 3 to 6. It can be determined as:
+```python
+R3_6 = R0_3.transpose() * rotation_ee
+```
+
+We only need 5 entries from this rotation matrix to determine theta 4 thru 6.
+
+![alt text][image10]
+
+```python
+beta = atan2(-r13, sqrt(r11 ** 2 + r12 ** 2))
+gamma = atan2(-r12, r11)
+alpha = atan2(r33, r23)
+```
+
+Note: the indices I got from the rotation matrix differs from the solution in the walkthrough. I don't know why mine is different but it doesn't yield good results whereas the walkthrough indices do.
+
+There are multiple solutions for theta5. Intuitively, if theta4 is rotated by 180 deg, then theta5 should be negative to be in the same position. My solution is to limit theta4 between 0 and 180 degrees. There's probably a more sensible solution.
+
+solution 1)
+```python
+    theta4 = gamma
+    theta5 = beta
+    theta6 = alpha
+```
+solution 2)
+```python
+    theta4 = gamma +/- pi
+    theta5 = -beta
+    theta6 = alpha +/- pi
 ```
 
 
